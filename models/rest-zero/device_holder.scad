@@ -10,13 +10,8 @@ include <BOSL2/std.scad>
 // ===== Device dimensions (mm) =====
 device_width = 200; // [100:1:300]
 device_depth = 10; // [5:1:50]
-device_height = 280; // [100:1:400]
-
-
-// Bevel Style//
-// extra length in units (15mm each) to add to the device holder //
-addition_units_width = 0; // [0:1:10]
-addition_units_height = 0; // [0:1:10] 
+device_height = 150; // [100:1:400]
+device_rounding = 2; // [0:1:50]
 
 module reference_unit() {
   cuboid(15, chamfer=.5);
@@ -33,8 +28,8 @@ module reference_device() {
 
 module bevel() {
   step = 15;
-  w = (ceil((device_width  + 30) / step) * step ) + (addition_units_width * 15);
-  h = (ceil((device_height + 30) / step) * step)  + (addition_units_height * 15);
+  w = (ceil((device_width  + 30) / step) * step );
+  h = (ceil((device_height + 30) / step) * step);
   color("black")
   cuboid([w, 2, h]);
 }
