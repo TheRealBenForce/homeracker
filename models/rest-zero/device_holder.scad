@@ -1,17 +1,15 @@
 //$fn=20;
 include <BOSL2/std.scad>
 
-//include <../core/main.scad>
-//include <../reference_devices/reference_devices.scad>
-//support(1, x_holes=false);
+// Homeraker dimensions (units)
+Homeracker_units_width = 120; // Count how many holes corner to corner
+Homeracker_units_depth = 80; // Count how many holes corner to corner
 
-// Surface Pro 3 = 292, 201, 9
-
-// ===== Device dimensions (mm) =====
-device_width = 200; // [100:1:300]
+// Device dimensions (mm)
+device_width = 75; // [100:1:300]
 device_depth = 10; // [5:1:50]
 device_height = 150; // [100:1:400]
-device_rounding = 2; // [0:1:50]
+device_rounding = 10; // [0:1:50]
 
 module reference_unit() {
   cuboid(15, chamfer=.5);
@@ -23,7 +21,7 @@ module reference_support(length=10) {
 
 module reference_device() {
   color("gray")
-  cuboid([device_width, device_depth, device_height], chamfer=1);
+  cuboid([device_width, device_depth, device_height], rounding=device_rounding, edges=[RIGHT, LEFT]);
 }
 
 module bevel() {
@@ -34,11 +32,17 @@ module bevel() {
   cuboid([w, 2, h]);
 }
 
+
+
 // Render the selected device plus the reference pieces
 reference_device();
 reference_unit(); 
-reference_support(length=16);
+//reference_support(length=16);
+
+
 
 rotate([0,90,0])
-reference_support(length=21);
+//reference_support(length=21);
 bevel();
+
+

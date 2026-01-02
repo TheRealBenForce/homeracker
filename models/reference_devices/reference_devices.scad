@@ -1,7 +1,7 @@
 include <BOSL2/std.scad>;
 
 module surface_pro_3() {
-    // Surface Pro 3 dimensions not exact
+    // Not print verified
     color("grey")
     cuboid([201, 9, 292], chamfer=6,center=true);
 }
