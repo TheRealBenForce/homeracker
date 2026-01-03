@@ -9,7 +9,7 @@ device_rounding = 5; // [0:1:50]
 
 /* [Bounding dimensions (units)] */
 // Your device must fit into this. Play around with it until you are happy.
-x_units = 9; // [1:1:50]
+x_units = 7; // [1:1:50]
 // Your device must fit into this.
 y_units = 4; // [1:1:50]
 // Your device must fit into this.
@@ -31,7 +31,7 @@ show_angle_label = true;
 unit_size_mm=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
 
 /* [Hidden] */
-x_mm  = x_units  * unit_size_mm;
+x_mm  = (x_units  * unit_size_mm);
 y_mm  = y_units  * unit_size_mm;
 z_mm  = z_units  * unit_size_mm;
 
@@ -46,6 +46,7 @@ module reference_unit() {
   }
 
 module reference_support(length=10) {
+  color("lightblue", .7)
   cuboid([length * unit_size_mm, unit_size_mm, unit_size_mm], chamfer=.5);
 }
 
@@ -76,10 +77,8 @@ module angle_label(
 }
 
 module bevel() {
-  step = unit_size_mm;
-
-  bevel_width  = ceil((device_width  + 30) / step) * step;
-  bevel_height = ceil((device_height + 30) / step) * step;
+  bevel_width  = x_mm;
+  bevel_height = tilt_length_mm;
 
   color("black")
   rotate([360-tilt_angle_deg, 0, 0])
@@ -88,46 +87,38 @@ module bevel() {
 
 // Render the selected device plus the reference pieces
 if (show_reference_supports){
-  color("lightblue") {
+  // Bottoms
+  left((x_mm / 2) - (unit_size_mm / 2))
+  down((z_mm / 2) - (unit_size_mm / 2))
+  zrot(90)
+  reference_support(length= y_units);
 
-    // Bottoms
-    left(x_mm / 2)
-    down(z_mm / 2)
-    zrot(90)
-    reference_support(length= y_units);
+  right((x_mm / 2) - (unit_size_mm / 2))
+  down((z_mm / 2) - (unit_size_mm / 2))
+  zrot(90)
+  reference_support(length= y_units);
 
-    right(x_mm / 2)
-    down(z_mm / 2)
-    zrot(90)
-    reference_support(length= y_units);
+  // Width
+  up((z_mm / 2) - (unit_size_mm / 2))
+  back((y_mm / 2) - (unit_size_mm / 2))
+  reference_support(length= x_units);
 
-    // Fronts
-    up(z_mm / 2)
-    back(y_mm / 2)
-    reference_support(length= x_units);
+  down((z_mm / 2) - (unit_size_mm / 2))
+  back((y_mm / 2) - (unit_size_mm / 2))
+  reference_support(length= x_units);
 
-    down(z_mm / 2)
-    back(y_mm / 2)
-    reference_support(length= x_units);
+  down((z_mm / 2) - (unit_size_mm / 2))
+  back(-(y_mm / 2) + (unit_size_mm / 2))
+  reference_support(length= x_units);
 
-    down(z_mm / 2)
-    back(-y_mm / 2)
-    reference_support(length= x_units);
-
-    // Sides
-    translate([x_mm / 2, y_mm / 2, 0])
+  // Sides
+  back((y_mm / 2) - (unit_size_mm / 2)){
+    left((x_mm / 2) - (unit_size_mm / 2))
     yrot(90)
     reference_support(length= z_units);
-
-    translate([-x_mm / 2, y_mm / 2, 0])
+    right((x_mm / 2) - (unit_size_mm / 2))
     yrot(90)
     reference_support(length= z_units);
-
-
-
-    //translate([0, 0, z_mm / 2])
-    //zrot(90)
-    //reference_support(length= y_units);
   }
 }
 if (show_reference_unit){
@@ -153,7 +144,7 @@ if (show_angle_label){
 }
 
 if (orientation == "Display") {
-  //bevel();
+  bevel();
 }
 
 // Utility: controlled rounding
