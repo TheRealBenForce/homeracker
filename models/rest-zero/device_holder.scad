@@ -61,7 +61,7 @@ module angle_label(
     decimals = 1,
     orient = [0,0,0]
 ) {
-    angle_txt = str(round_to(tilt_angle_deg, decimals), "°");
+    angle_txt = str("~", round_to(tilt_angle_deg, decimals), "°");
 
     translate(pos)
     rotate(orient)
