@@ -1,12 +1,6 @@
 //$fn=20;
 include <BOSL2/std.scad>
 
-/* [Bounding dimensions (units)] */
-
-x_units = 9; // Your device must fit into this.
-y_units = 4; // Your device must fit into this.
-z_units = 15; // Your device must fit into this.
-
 /* [Device dimensions (mm)] */
 device_width = 75; // [100:1:300]
 device_depth = 10; // [5:1:50]
@@ -27,7 +21,7 @@ orientation= "Display"; // ["Display", "Print"]
 // Show the reference unit block. Won't appear in print view.
 show_reference_unit = false; 
 // Show the reference support block. Won't appear in print view.
-show_reference_support = false; 
+show_reference_supports = false; 
 // Show the reference device block. Won't appear in print view.
 show_reference_device = true; 
 // Show angle size for reference.
@@ -52,7 +46,7 @@ module reference_unit() {
   }
 
 module reference_support(length=10) {
-  cuboid([length * 15, 15, 15], chamfer=.5);
+  cuboid([length * unit_size_mm, unit_size_mm, unit_size_mm], chamfer=.5);
 }
 
 module reference_device() {
@@ -93,8 +87,48 @@ module bevel() {
 }
 
 // Render the selected device plus the reference pieces
-if (show_reference_support){
-  reference_support(length=10);
+if (show_reference_supports){
+  color("lightblue") {
+
+    // Bottoms
+    left(x_mm / 2)
+    down(z_mm / 2)
+    zrot(90)
+    reference_support(length= y_units);
+
+    right(x_mm / 2)
+    down(z_mm / 2)
+    zrot(90)
+    reference_support(length= y_units);
+
+    // Fronts
+    up(z_mm / 2)
+    back(y_mm / 2)
+    reference_support(length= x_units);
+
+    down(z_mm / 2)
+    back(y_mm / 2)
+    reference_support(length= x_units);
+
+    down(z_mm / 2)
+    back(-y_mm / 2)
+    reference_support(length= x_units);
+
+    // Sides
+    translate([x_mm / 2, y_mm / 2, 0])
+    yrot(90)
+    reference_support(length= z_units);
+
+    translate([-x_mm / 2, y_mm / 2, 0])
+    yrot(90)
+    reference_support(length= z_units);
+
+
+
+    //translate([0, 0, z_mm / 2])
+    //zrot(90)
+    //reference_support(length= y_units);
+  }
 }
 if (show_reference_unit){
   
@@ -119,7 +153,7 @@ if (show_angle_label){
 }
 
 if (orientation == "Display") {
-  bevel();
+  //bevel();
 }
 
 // Utility: controlled rounding

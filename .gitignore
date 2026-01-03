@@ -11,3 +11,6 @@ __pycache__/
 *.py[cod]
 cmd/scadm/dist/
 cmd/scadm/*.egg-info/
+
+
+models/rest-zero/*.json
