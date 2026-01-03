@@ -22,6 +22,8 @@ show_reference_unit = false;
 show_reference_support = false; 
 // Show the reference device block. Won't appear in print view.
 show_reference_device = true; 
+// Show angle size for reference.
+show_angle_label = true;
 
 /* [Experimental] */
 unit_size_mm=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
@@ -50,6 +52,27 @@ module reference_device() {
   cuboid([device_width, device_depth, device_height], rounding=device_rounding, edges=[TOP+RIGHT, TOP+LEFT, BOTTOM+RIGHT, BOTTOM+LEFT]);
 }
 
+// BOSL2-based angle label
+module angle_label(
+    tilt_angle_deg,
+    pos = [0,0,0],
+    size = 8,
+    thickness = 1,
+    decimals = 1,
+    orient = [0,0,0]
+) {
+    angle_txt = str(round_to(tilt_angle_deg, decimals), "°");
+
+    translate(pos)
+    rotate(orient)
+        text3d(
+            angle_txt,
+            size = size,
+            height = thickness,
+            anchor = CENTER
+        );
+}
+
 module bevel() {
   step = unit_size_mm;
 
@@ -57,7 +80,7 @@ module bevel() {
   bevel_height = ceil((device_height + 30) / step) * step;
 
   color("black")
-  rotate([tilt_angle_deg, 0, 0])
+  rotate([360-tilt_angle_deg, 0, 0])
     cuboid([bevel_width, 2, bevel_height]);
 }
 
@@ -70,8 +93,21 @@ if (show_reference_unit){
   reference_unit();
 }
 if (show_reference_device){
-  rotate([tilt_angle_deg, 0, 0])
+  rotate([360 - tilt_angle_deg, 0, 0])
   reference_device();
+}
+
+if (show_angle_label){
+  //rotate([90, 0, 0])
+  translate([ 0, 0, 0])
+  angle_label(
+      tilt_angle_deg,
+      pos = [0, -y_mm / 2, 0],
+      size = 20,
+      thickness = 1,
+      decimals = 1,
+      orient = [90, 0, 0]   // face upward
+  );
 }
 
 
@@ -84,4 +120,8 @@ if (orientation == "Cage") {
 if (orientation == "Display") {
   bevel();
 }
+
+// Utility: controlled rounding
+function round_to(n, decimals=1) =
+    round(n * pow(10, decimals)) / pow(10, decimals);
 
