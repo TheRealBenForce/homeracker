@@ -3,9 +3,9 @@ include <BOSL2/std.scad>
 
 /* [Bounding dimensions (units)] */
 
-unit_width = 9; // Your device must fit into this.
-unit_depth = 4; // Your device must fit into this.
-unit_height = 15; // Your device must fit into this.
+x_units = 9; // Your device must fit into this.
+y_units = 4; // Your device must fit into this.
+z_units = 15; // Your device must fit into this.
 
 /* [Device dimensions (mm)] */
 device_width = 75; // [100:1:300]
@@ -24,18 +24,18 @@ show_reference_support = false;
 show_reference_device = true; 
 
 /* [Experimental] */
-unit_size=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
+unit_size_mm=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
 
 /* [Hidden] */
-x = unit_height * unit_size;
-y = unit_depth * unit_size;
-z = unit_width * unit_size;
+x_mm  = x_units  * unit_size_mm;
+y_mm  = y_units  * unit_size_mm;
+z_mm  = z_units  * unit_size_mm;
 
-hypotenuse = sqrt(x*x + y*y);
-angle = atan2(y, x); // OpenSCAD returns degrees already
+tilt_length_mm = sqrt(z_mm*z_mm + y_mm*y_mm);
+tilt_angle_deg = atan2(y_mm, z_mm); // OpenSCAD = degrees
 
-echo(hypotenuse_mm = hypotenuse);
-echo(rotation_deg = angle);
+echo("Tilt length (mm): ", tilt_length_mm);
+echo("Tilt angle (deg): ", tilt_angle_deg);
 
 module reference_unit() {
   cuboid(unit, chamfer=.5);
@@ -51,11 +51,14 @@ module reference_device() {
 }
 
 module bevel() {
-  step = 15;
-  w = (ceil((device_width  + 30) / step) * step );
-  h = (ceil((device_height + 30) / step) * step);
+  step = unit_size_mm;
+
+  bevel_width  = ceil((device_width  + 30) / step) * step;
+  bevel_height = ceil((device_height + 30) / step) * step;
+
   color("black")
-  cuboid([w, 2, h]);
+  rotate([tilt_angle_deg, 0, 0])
+    cuboid([bevel_width, 2, bevel_height]);
 }
 
 // Render the selected device plus the reference pieces
@@ -63,20 +66,22 @@ if (show_reference_support){
   reference_support(length=10);
 }
 if (show_reference_unit){
+  
   reference_unit();
 }
 if (show_reference_device){
+  rotate([tilt_angle_deg, 0, 0])
   reference_device();
 }
 
 
 
-if (orientation[0] == "Cage") {
+if (orientation == "Cage") {
   color("blue", 0.5)
-  cuboid([unit * unit_width, unit * unit_depth, unit * unit_height], chamfer=.5, edges=[FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM]);
+  cuboid([unit_size_mm * unit_width, unit_size_mm * unit_depth, unit_size_mm * unit_height], chamfer=.5, edges=[FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM]);
 }
 
-
-bevel();
-
+if (orientation == "Display") {
+  bevel();
+}
 
