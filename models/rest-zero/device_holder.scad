@@ -13,9 +13,17 @@ device_depth = 10; // [5:1:50]
 device_height = 150; // [100:1:400]
 device_rounding = 5; // [0:1:50]
 
+/* [Bounding dimensions (units)] */
+// Your device must fit into this. Play around with it until you are happy.
+x_units = 9; // [1:1:50]
+// Your device must fit into this.
+y_units = 4; // [1:1:50]
+// Your device must fit into this.
+z_units = 15; // [1:1:50]
+
 /* [Display options] */
 // Export to print view when you are ready.
-orientation= "Display"; // ["Display", "Cage", "Print"]
+orientation= "Display"; // ["Display", "Print"]
 // Show the reference unit block. Won't appear in print view.
 show_reference_unit = false; 
 // Show the reference support block. Won't appear in print view.
@@ -108,13 +116,6 @@ if (show_angle_label){
       decimals = 1,
       orient = [90, 0, 0]   // face upward
   );
-}
-
-
-
-if (orientation == "Cage") {
-  color("blue", 0.5)
-  cuboid([unit_size_mm * unit_width, unit_size_mm * unit_depth, unit_size_mm * unit_height], chamfer=.5, edges=[FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM]);
 }
 
 if (orientation == "Display") {
