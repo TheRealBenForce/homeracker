@@ -11,15 +11,15 @@ unit_height = 15; // Your device must fit into this.
 device_width = 75; // [100:1:300]
 device_depth = 10; // [5:1:50]
 device_height = 150; // [100:1:400]
-device_rounding = 10; // [0:1:50]
+device_rounding = 3; // [0:1:50]
 
 /* [Display options] */
 // Export to print view when you are ready.
 orientation= "Display"; // ["Display", "Cage", "Print"]
 // Show the reference unit block. Won't appear in print view.
-show_reference_unit = true; 
+show_reference_unit = false; 
 // Show the reference support block. Won't appear in print view.
-show_reference_support = true; 
+show_reference_support = false; 
 // Show the reference device block. Won't appear in print view.
 show_reference_device = true; 
 
@@ -27,7 +27,15 @@ show_reference_device = true;
 unit_size=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
 
 /* [Hidden] */
+x = unit_height * unit_size;
+y = unit_depth * unit_size;
+z = unit_width * unit_size;
 
+hypotenuse = sqrt(x*x + y*y);
+angle = atan2(y, x); // OpenSCAD returns degrees already
+
+echo(hypotenuse_mm = hypotenuse);
+echo(rotation_deg = angle);
 
 module reference_unit() {
   cuboid(unit, chamfer=.5);
@@ -39,7 +47,7 @@ module reference_support(length=10) {
 
 module reference_device() {
   color("gray")
-  cuboid([device_width, device_depth, device_height], rounding=device_rounding, edges=[RIGHT, LEFT]);
+  cuboid([device_width, device_depth, device_height], rounding=device_rounding, edges=[TOP+RIGHT, TOP+LEFT, BOTTOM+RIGHT, BOTTOM+LEFT]);
 }
 
 module bevel() {
@@ -49,6 +57,7 @@ module bevel() {
   color("black")
   cuboid([w, 2, h]);
 }
+
 // Render the selected device plus the reference pieces
 if (show_reference_support){
   reference_support(length=10);
@@ -72,6 +81,6 @@ if (orientation[0] == "Cage") {
 
 rotate([0,90,0])
 reference_support(length=21);
-bevel();
+//bevel();
 
 
