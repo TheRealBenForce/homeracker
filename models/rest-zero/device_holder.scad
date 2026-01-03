@@ -15,6 +15,12 @@ y_units = 4; // [1:1:50]
 // Your device must fit into this.
 z_units = 15; // [1:1:50]
 
+/* [Connection Points] */
+// Where the bevel connects to the frame at the top.
+top = "outside"; // ["outside", "inside"]
+// Where the bevel connects to the frame at the bottom.
+bottom = "outside"; // ["outside", "inside"]
+
 /* [Display options] */
 // Export to print view when you are ready.
 orientation= "Display"; // ["Display", "Print"]
@@ -36,8 +42,14 @@ y_mm  = y_units  * unit_size_mm;
 z_mm  = z_units  * unit_size_mm;
 
 bevel_x_mm = x_mm;
-bevel_y_mm = y_mm - (unit_size_mm * 2);
-bevel_z_mm = z_mm - (unit_size_mm * 2);
+bevel_z_mm = (top == "inside")
+    ? z_mm - (unit_size_mm * 2)
+    : z_mm - unit_size_mm;
+
+bevel_y_mm = (bottom == "inside")
+    ? y_mm - (unit_size_mm * 2)
+    : y_mm - unit_size_mm;
+
 
 tilt_length_mm = sqrt(bevel_z_mm*bevel_z_mm + bevel_y_mm*bevel_y_mm);
 tilt_angle_deg = atan2(bevel_y_mm, bevel_z_mm); // OpenSCAD = degrees
@@ -91,9 +103,14 @@ module bevel() {
   bevel_width  = x_mm;
   bevel_height = tilt_length_mm;
 
-  color("black")
-  rotate([360-tilt_angle_deg, 0, 0])
+  rotate([360-tilt_angle_deg, 0, 0]) {
+    if (show_reference_device) {
+      back(device_depth / 2)
+      reference_device();
+    }
+    color("black")
     cuboid([bevel_width, 2, bevel_height]);
+  }
 }
 
 // Render the selected device plus the reference pieces
@@ -133,13 +150,25 @@ if (show_reference_supports){
   }
 }
 if (show_reference_unit){
-  
   reference_unit();
-}
-if (show_reference_device){
-  rotate([360 - tilt_angle_deg, 0, 0])
-  reference_device();
-}
+  }
+
+//if (show_reference_device){
+//  rotate([360 - tilt_angle_deg, 0, 0])
+//  if ((top == "outside") || (bottom == "outside")) {
+//    up(unit_size_mm / 2)
+//    fwd(unit_size_mm / 2)
+//    reference_device();
+//  } else if (top == "outside") {
+//    up(unit_size_mm / 2)
+//    reference_device();
+//  } else if (botton == "outside") {
+//    fwd(unit_size_mm / 2)
+//    reference_device();
+//  } else {
+//    reference_device();
+//  }
+//}
 
 if (show_angle_label){
   //rotate([90, 0, 0])
@@ -155,7 +184,19 @@ if (show_angle_label){
 }
 
 if (orientation == "Display") {
-  bevel();
+  if ((top == "outside") || (bottom == "outside")) {
+    up(unit_size_mm / 2)
+    fwd(unit_size_mm / 2)
+    bevel();
+  } else if (top == "outside") {
+    up(unit_size_mm / 2)
+    bevel();
+  } else if (botton == "outside") {
+    fwd(unit_size_mm / 2)
+    bevel();
+  } else {
+    bevel();
+  }
 }
 
 // Utility: controlled rounding
