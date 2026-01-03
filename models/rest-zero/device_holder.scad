@@ -35,11 +35,22 @@ x_mm  = (x_units  * unit_size_mm);
 y_mm  = y_units  * unit_size_mm;
 z_mm  = z_units  * unit_size_mm;
 
-tilt_length_mm = sqrt(z_mm*z_mm + y_mm*y_mm);
-tilt_angle_deg = atan2(y_mm, z_mm); // OpenSCAD = degrees
+bevel_x_mm = x_mm;
+bevel_y_mm = y_mm - (unit_size_mm * 2);
+bevel_z_mm = z_mm - (unit_size_mm * 2);
+
+tilt_length_mm = sqrt(bevel_z_mm*bevel_z_mm + bevel_y_mm*bevel_y_mm);
+tilt_angle_deg = atan2(bevel_y_mm, bevel_z_mm); // OpenSCAD = degrees
 
 echo("Tilt length (mm): ", tilt_length_mm);
 echo("Tilt angle (deg): ", tilt_angle_deg);
+
+if (x_mm - (unit_size_mm * 2) < device_width ||
+    y_mm - (unit_size_mm * 2) < device_depth ||
+    z_mm - (unit_size_mm * 2) < device_height) {
+  echo("WARNING: Device does not fit within bounding dimensions!");
+}
+
 
 module reference_unit() {
   cuboid(unit, chamfer=.5);
