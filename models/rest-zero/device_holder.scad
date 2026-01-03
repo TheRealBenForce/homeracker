@@ -1,18 +1,32 @@
 //$fn=20;
 include <BOSL2/std.scad>
 
-// Global dimensions (units)
-unit=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
+/* [Bounding dimensions (units)] */
+
 unit_width = 9; // Your device must fit into this.
 unit_depth = 4; // Your device must fit into this.
 unit_height = 15; // Your device must fit into this.
-display_cage = false; // Set to true to display the full cage for reference.
 
-// Device dimensions (mm)
+/* [Device dimensions (mm)] */
 device_width = 75; // [100:1:300]
 device_depth = 10; // [5:1:50]
 device_height = 150; // [100:1:400]
 device_rounding = 10; // [0:1:50]
+
+/* [Display options] */
+// Export to print view when you are ready.
+orientation= "Display"; // ["Display", "Cage", "Print"]
+// Show the reference unit block. Won't appear in print view.
+show_reference_unit = true; 
+// Show the reference support block. Won't appear in print view.
+show_reference_support = true; 
+// Show the reference device block. Won't appear in print view.
+show_reference_device = true; 
+
+/* [Experimental] */
+unit_size=15; // Size of one unit of measurement. Defaults to 15 for homeracker.
+
+/* [Hidden] */
 
 
 module reference_unit() {
@@ -33,23 +47,31 @@ module bevel() {
   w = (ceil((device_width  + 30) / step) * step );
   h = (ceil((device_height + 30) / step) * step);
   color("black")
-  cuboid([h, 2, w]);
+  cuboid([w, 2, h]);
+}
+// Render the selected device plus the reference pieces
+if (show_reference_support){
+  reference_support(length=10);
+}
+if (show_reference_unit){
+  reference_unit();
+}
+if (show_reference_device){
+  reference_device();
 }
 
-if (display_cage) {
+
+
+if (orientation[0] == "Cage") {
   color("blue", 0.5)
   cuboid([unit * unit_width, unit * unit_depth, unit * unit_height], chamfer=.5, edges=[FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM]);
 }
 
-// Render the selected device plus the reference pieces
-reference_device();
-reference_unit(); 
-//reference_support(length=16);
 
 
 
 rotate([0,90,0])
-//reference_support(length=21);
+reference_support(length=21);
 bevel();
 
 
