@@ -11,7 +11,7 @@ unit_height = 15; // Your device must fit into this.
 device_width = 75; // [100:1:300]
 device_depth = 10; // [5:1:50]
 device_height = 150; // [100:1:400]
-device_rounding = 3; // [0:1:50]
+device_rounding = 5; // [0:1:50]
 
 /* [Display options] */
 // Export to print view when you are ready.
@@ -77,10 +77,6 @@ if (orientation[0] == "Cage") {
 }
 
 
-
-
-rotate([0,90,0])
-reference_support(length=21);
-//bevel();
+bevel();
 
 
